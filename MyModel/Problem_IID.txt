@@ -1,0 +1,17 @@
+设$X_1,X_2,...X_{2n+1}$为i.i.d.的[0,1]上的均匀分布，
+$\hat{X}_n$为最中间的次序统计量，证明$\lim_{n \to +\infty}\hat{X}_n$依概率收敛到$\frac{1}{2}$
+\newline
+考虑$\hat{X}_n$的pdf为:
+\begin{equation}
+f_n(u)=\frac{(2n+1)!}{n!n!}u^n(1-u)^n
+\end{equation}
+即$\hat{X}_n$服从参数为$B(n+1,n+1)$的beta分布。
+如果能证明$\lim_{n \to +\infty}f_n(u)=\delta(u-\frac{1}{2})$,其中$\delta(x)$是Delta函数，则原问题得证。
+由Stirling公式，$n!$和$\sqrt{2\pi n}(\frac{n}{e})^n$当$n \to +\infty$时为等价无穷大量。
+所以
+\begin{multline}
+\lim_{n \to +\infty}f_n(u)=exp(n\ln(u)+n\ln(1-u))\frac{2n+1}{\sqrt{\pi n}}2^{2n}=exp(n\ln(4u(1-u)))\frac{2n+1}{\sqrt{\pi n} double column }
+\end{multline}
+上式当$u\in(0,1)$但不等于$\frac{1}{2}$时$\ln(4u(1-u))<0$,故对这种情形$\lim_{n \to +\infty}f_n(u)=0$，
+当$u=\frac{1}{2}$,上式指数项为0，故对这种情形$\lim_{n \to +\infty}f_n(u)=\infty$.
+又因为$f_n(u)$始终满足在[0,1]区间上积分为1，故$f_n(u)$极限是Delta函数的结论成立。

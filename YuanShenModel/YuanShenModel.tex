@@ -1,0 +1,72 @@
+\documentclass[12pt]{article}
+\usepackage{xeCJK}%preamble part
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage[a4paper, inner=1.5cm, outer=3cm, top=2cm, bottom=3cm, bindingoffset=1cm]{geometry}
+\usepackage{epstopdf}
+\usepackage{array}
+\usepackage{fontspec}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage[citecolor=blue]{hyperref}
+
+\usepackage{makecell}
+\usepackage[lofdepth,lotdepth]{subfig}
+\setCJKmainfont[BoldFont={SimHei}]{SimSun}
+\setCJKmonofont{SimSun}
+\setmainfont{Times New Roman}
+\newCJKfontfamily[hei]\heiti{SimHei}
+\setlength{\extrarowheight}{4pt}
+\setlength{\parindent}{1cm}
+\begin{document}
+\title{\textbf{\fontsize{15.75pt}{\baselineskip}{模型的建立和下一步的目标}}} 
+
+\author{\fontsize{12pt}{\baselineskip}{数33 赵丰会议记录}}
+\maketitle
+\large
+\section{\textbf{\fontsize{12pt}{\baselineskip}{模型建立}}}
+假设在两组实验条件下分别获得RNA序列的统计信号$Y_1(n)$和$Y_2(n)$.
+其中n是正整数,表示位点的序号$Y_1(n) \ge 0,1\le n \le N$,N表示序列长度。
+对给定的RNA序列我们假设其在不同的实验条件下为Markov 链，分别记为$X_1(n),X_2(n),X_i(n),i=1,2$只能取0和1两个取值
+(可以设0表示单链，1表示双链）。每条链的初始状态为$X_i(1)$，是非随机的。每条链的转移概率矩阵为$P_i，P_i$具有的特征是
+对角元的数特别大（比如为0.99),表示该链上后一个位点的状态具有很大的概率和前一个位点的状态保持一致。
+参照BUMHMM Model我们进一步假设当$X_i(n)=0$时，$Y_i(n)$服从$Beta(\alpha,\beta)$分布，
+当$X_i(n)=1$时，$Y_i(n)$服从均匀分布。这样即建立原问题的数学模型。
+\section{\textbf{\fontsize{12pt}{\baselineskip}{求解思路}}}
+参考 $\href{https://github.com/RNA-Structure-Dynamics/Model}{Data_Processing.pdf}$,为降低单位点实验重复次数较少带来的误差，我们
+考虑r(比如r=3)个位点联合比较，这时做假设检验的统计量具有如下基本的形式：
+\begin{equation}
+\sum_{i=1}^r \alpha_i \frac{\bar{z_i}-\bar{z'_i}}{\sqrt{S_{z_i}^2/N1+S_{z_i}'^2/N1}}
+\end{equation}
+其中$N1$为实验重复次数，$\alpha_i$是线性组合系数，一般可全取1。
+以下有两种主要思路：
+
+(1)假设相邻r个位点的相关性很强（要么“全相同”，要么全不同，这里“全相同”指的是两条链的对应r个位点同时为单链或双链）由于同一个位点(忽略端点）可以参与r组假设检验，因此可以得到r个是否接受原假设的判决结果（设接受原假设为0,拒绝原假设为1），根据r个值中0占多数还是少数给出最终某位点在不同实验条件下单双链是否相同的判决，同时根据0,1的比例报告置信度。
+
+(2)假设相邻r个位点的有一定的相关性（例如r=3时不会出现 相同-不同-相同 这种组合），则需要构造一个多个结果的假设检验，由相关性的假设可以认为
+假设检验结果的个数小于$2^r$,为判断最终结果属于哪一类，需要有多个统计量参与，构造多个统计量的方法可参考(1)式，只是取$\alpha_i$为不同的值（比如相互正交)。在这种情况下，需要先把长度为N的链等分成不相交的若干份，每份长度为r，对每份分别进行处理。
+\section{\textbf{\fontsize{12pt}{\baselineskip}{简单的带相关性估计的理论推导}}}
+先考虑一随机变量X,X~N(0,1)with probability 0.5;~N(1,1) with probability 0.5.
+Y~N(0,1) with probability 0.95;~N(1,1) with probability 0.05 if mean(X)=0;
+Y~N(1,1) with probability 0.05;~N(0,1) with probability 0.05 if mean(X)=1.
+可以看出X,Y有相关性，
+现在如果给出X的一组数据（比如4个），数据量较少，同时也有等长的一组Y数据（比如4个）。
+我们想知道能否用某种方法把这两组数据全用上来来提高判决结果的准确性。
+这里准确性指的是如果对于随机生成的01序列，由对应位点的01序列先产生相应均值的正态分布$X_i$和$Y_i$各4个。
+仅由每个位点的4组$X_i$数据给一个01序列的判决结果，再由利用上$Y_i$数据给一组判决结果，使得后一组结果准确率明显高于前一组判决结果。
+
+\section{\textbf{\fontsize{12pt}{\baselineskip}{下一步的打算}}}
+\begin{enumerate}
+\item 首先用R语言尝试正向仿真建模。
+\item 其次用上述方法尝试给出判决结果，并与事前数据进行比较。
+\item 如果上述假设检验方法较合理，尝试对有训练集的短链RNA进行模型的参数匹配。
+\item 由于上述模型比较复杂，完整的理论分析比较困难，但会尝试给出某些理论分析的结果。
+
+\end{enumerate}
+\section{\textbf{\fontsize{12pt}{\baselineskip}{参考文献}}}
+\begin{thebibliography}{}
+\bibitem{Bib1}    
+ 生物信息学
+ 
+\end{thebibliography}
+\end{document}

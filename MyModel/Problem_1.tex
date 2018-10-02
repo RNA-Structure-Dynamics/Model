@@ -1,0 +1,57 @@
+\documentclass[12pt,twocolumn]{article}
+\usepackage{xeCJK}%preamble part
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage[a4paper, inner=1.5cm, outer=3cm, top=2cm, bottom=3cm, bindingoffset=1cm]{geometry}
+\usepackage{epstopdf}
+\usepackage{array}
+\usepackage{fontspec}
+\usepackage{gensymb}
+\usepackage[citecolor=blue]{hyperref}
+\usepackage{amsmath}
+\usepackage{makecell}
+\usepackage[lofdepth,lotdepth]{subfig}
+\setCJKmainfont[BoldFont={SimHei}]{SimSun}
+\setCJKmonofont{SimSun}
+\setmainfont{Times New Roman}
+\newCJKfontfamily[hei]\heiti{SimHei}
+\setlength{\extrarowheight}{4pt}
+\setlength{\parindent}{1cm}
+\begin{document}
+\large
+\twocolumn
+\setlength{\columnseprule}{1pt}
+均值和方差是很容易理解的概念，实验多次测量，测量值的均值作为估计，样本方差的大小衡量数据的可靠性，我觉得对于简单的统计问题（单样本，抽样之间独立），搬出理论框架并不会比凭感觉乱搞多增加多少可靠性;对于比较复杂的问题（数据维数多，相关性错综复杂），感觉帮不上太多的忙，主要要靠理论指导，然而我对其理论框架并不甚了解，故以下的讨论只好举出非常简单的例子，讨论推断性统计学的框架均值和方差的问题，大概至少要分三种情况：
+
+\begin{enumerate}
+\item 区间估计
+\item 点估计
+\item 假设检验
+\end{enumerate}
+
+先讨论第一种情形，大学物理绪论课（参见\cite{Bib1})讲由于随机误差的存在，结果要写成$\bar{x}+t_{\xi}(\nu)S_{\bar{x}}$的形式，就是区间估计的表达方式。
+意思是说，假设待测物理量是一个随机变量X,X服从正态分布$N(\mu,\sigma)$。现在要测它的均值E(X)((就是估计参数$\mu$))。先给定一个置信度$\alpha$（比如95\%),那么我有$\alpha$的把握断言E(X)落在
+区间$[\bar{X}-t_{\xi}(\nu)S_{\bar{X}},\bar{X}+t_{\xi}(\nu)S_{\bar{X}}]$,关于$\alpha$，实验重复次数和区间大小的关系具体表达式就不给出了，只是定性地说，$alpha$越接近1，$t_{\xi}(\nu)$会越大，要估计的值落在一个更大的区间里，极端情况是说我有100\%的把握断言E(X)落在
+区间$[\bar{X}-\infty,\bar{X}+\infty]$,这样Inference也没什么意义了;实验重复次数越多$S_{\bar{X}}$会越小，要估计的值落在一个更小的区间里，极端情况是说只要实验重复足够多次，我就有$\alpha$的把握断言E(X)一定是$\bar{X}$。
+
+上面举了X是连续性随机变量的例子，对于离散的情形，一般会考虑Bernoulli分布B(p)。同样是先给定一个置信度$\alpha$，
+那么我有$\alpha$的把握断言E(X)(就是估计参数p)落在某个区间，关于这个区间构造最简单的方法是:
+\begin{equation*}
+[\bar{x}-z\sqrt{\frac{\bar{x}(1-\bar{x})}{n}},\bar{x}+z\sqrt{\frac{\bar{x}(1-\bar{x})}{n}}] \quad^{\cite{Bib2}}
+\end{equation*}
+这个估计并不好，一方面只有当实验重复次数足够多时近似程度才比较好，另一方面当p接近0或者1时区间长度会很窄，估计效果很差$^{\cite{Bib3}}$。
+\onecolumn
+
+再讨论第一种情形，即只有两种判决结果的假设检验问题，此处仍然分正态性样本和Bernoulli实验样本两种最常用的情况分别讨论。
+对于正态性样本$X$,N次实验的结果得到$X_i,i=1,2,...N$,为$i.i.d$的$r.v.$,为检验样本均值是否为$\mu_0$,构造统计量
+\begin{equation}
+T=\frac{\bar{x}-\mu_0}{\sqrt{S^2_X/N}}
+\end{equation}
+$H_0:\mu=\mu_0 versus H_1:\mu \not \mu_0$
+
+\begin{thebibliography}{}
+\bibitem{Bib1}大学物理实验误差与数据处理章节
+\bibitem{Bib2} \url{http://www.math.uah.edu/stat/interval/Bernoulli.html}
+\bibitem{Bib3} \url{https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval}
+\end{thebibliography}
+\end{document}
