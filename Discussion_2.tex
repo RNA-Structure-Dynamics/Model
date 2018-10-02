@@ -1,0 +1,152 @@
+\documentclass[12pt]{article}
+\usepackage{xeCJK}%preamble part
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage[a4paper, inner=1.5cm, outer=3cm, top=2cm, bottom=3cm, bindingoffset=1cm]{geometry}
+\usepackage{epstopdf}
+\usepackage{listings}
+\usepackage{array}
+\usepackage{fontspec}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage[citecolor=blue]{hyperref}
+
+\usepackage{makecell}
+\usepackage[lofdepth,lotdepth]{subfig}
+\setCJKmainfont[BoldFont={SimHei}]{SimSun}
+\setCJKmonofont{SimSun}
+\setmainfont{Times New Roman}
+\newCJKfontfamily[hei]\heiti{SimHei}
+\setlength{\extrarowheight}{4pt}
+\setlength{\parindent}{1cm}
+\begin{document}
+\title{\textbf{\fontsize{15.75pt}{\baselineskip}{和沈老师讨论的进一步结果}}} 
+
+\author{\fontsize{12pt}{\baselineskip}{数33 赵丰}}
+\maketitle
+\large
+\section{\textbf{\fontsize{12pt}{\baselineskip}{仿真结果}}}
+采用前面所述的方法进行仿真，只考虑单位点的情形，每个位点采四个数据，01序列由之前所述的Markov 链生成，
+将贝叶斯方法与传统的t检验进行对比，根据仿真实验的参数，贝叶斯方法最小错误率为$2P(Z<-1)\approx 0.32$
+对长为1000的链，由于其出现01的概率相等，所以用贝叶斯方法的错误率实际上只有理论值的一半，为0.159左右。
+传统的t检验由于只是控制第一类错误的概率，没有考虑到$\theta \ne 0$时$\bar{x}$具体的分布，因此没有充分利用
+$\theta$的先验的非0即1的信息，在样本值为1000的情况下，通过调整显著性水平$\alpha$的值，总的错误率只能降低到
+27\%左右。相比较而言，贝叶斯统计更有优势。
+\section{\textbf{\fontsize{12pt}{\baselineskip}{参数估计}}}
+虽然01序列的各个位点有很强的相关性，但一旦01序列给定，不同位点的观测值彼此独立，如前节假定
+$X \sim N(\mu_1,\sigma_1^2) | \theta=0),X \sim N(\mu_2,\sigma_2^2) | \theta=1)$.
+通过对RNA序列的统计，可以得到单双链的比例p,即$\theta \sim B(p)$。
+由于RNA序列一般较长，即使单个位点采集的样本点很少，但总共的信息很多，我们可以利用全局的信息对
+$\mu_1,\mu_2,\sigma_1,\sigma_2$用矩估计的方法做出估计。
+方法如下：
+将所有位点的观测值$X_1,X_2,..X_n$分别求1到4阶矩，$X_i$之间彼此独立，由于n很大，由大数定律可得:
+\begin{equation}
+\frac{\sum_{i=1}^n X^j_i}{n} \approx (1-p)E(X^j|\theta=0)+pE(X^j|\theta=1),j=1,2,3,4
+\end{equation}
+由正态分布的密度函数可分别算出其前4阶原点矩，由此得如下关于$\mu_1,\mu_2,\sigma_1,\sigma_2$
+的4元方程：
+\begin{equation}
+\begin{split}
+&\frac{\sum_{i=1}^n X_i}{n} \approx (1-p)\mu_1+p\mu_2 \\
+&\frac{\sum_{i=2}^n X^2_i}{n} \approx (1-p)(\mu_1^2+\sigma_1^2)+p(\mu_2^2+\sigma_2^2) \\
+&\frac{\sum_{i=2}^n X^3_i}{n} \approx (1-p)(\mu_1^3+3\sigma_1^2\mu_1)+p(\mu_2^3+3\sigma_2^2\mu_2) \\
+&\frac{\sum_{i=2}^n X^4_i}{n} \approx (1-p)(\mu_1^4+6\sigma_1^2\mu_1^2+3\sigma_1^4)+p(\mu_2^4+6\sigma_2^2\mu_2^2+3\sigma_2^4)
+\end{split}
+\end{equation}
+根据原始数据可以求出上述方程组左边的值，由此解出待估计参数。
+\section{\textbf{\fontsize{12pt}{\baselineskip}{参数估计数值实验}}}
+使用李盼提供的数据（只用RT)读取某实验条件下实验组2组，对照组两组，每组数据长度均为1870。
+先将对照组数据取平均值，再用实验组除以取平均值后的对照组，R代码如下：
+\begin{lstlisting}{language=R}
+x1<-scan('cy_D1.rt',what=numeric(0),n=1e6)
+x2<-scan('cy_D2.rt',what=numeric(0),n=1e6)
+x3<-scan('cy_N1.rt',what=numeric(0),n=1e6)
+x4<-scan('cy_N2.rt',what=numeric(0),n=1e6)
+x_case_1<-2*x3/(x1+x2);
+x_case_2<-2*x4/(x1+x2);
+#cor(x1,x2)=0.93
+#cor(x3,x4)=0.99
+\end{lstlisting}
+进一步计算两组case的统计信息得下表：
+\begin{table}[!ht]
+\begin{tabular}{ccc}
+\hline
+参数 & x\_case\_1 & x\_case\_2 \\
+\hline
+最小值 & 0.083 & 0.108 \\
+最大值 & 5.882 & 5.457 \\
+一阶原点矩 &1.729 & 1.807 \\
+二阶原点矩 &4.106 & 4.377\\
+三阶原点矩 &11.963 &12.681\\
+四阶原点矩 &40.513 &41.610\\
+\hline
+\end{tabular}
+\end{table}
+从上表可以看出两组数据相差不大，可以用将两组数据合并用来估计四个参数。有icshape实验值按0.5的阈值二值化得01序列，计算出单链比例为0.53，近似取p=0.5.代入已知数据，求解上述非线性方程组得：
+\[\mu_1=1.165,\mu_2=2.371,\sigma_1^2=0.269,\sigma_2^2=1.236\]
+下面利用单位点的两组数据根据前面的贝叶斯统计模型做判决，R代码如下：
+\begin{lstlisting}{language=R}
+mu_1=2.3711
+mu_2=1.1649
+sigma_1=1.2362
+sigma_2=0.2686
+n=2
+my_y=c()
+for(i in 1:length(x_case_1)){
+xbar=(x_case_1[i]+x_case_2[i])/2;
+p1=log(sigma_1)+n*(xbar-mu_1)^2/sigma_1^2;
+p2=log(sigma_2)+n*(xbar-mu_2)^2/sigma_2^2;
+if(p1>p2){
+my_y=c(my_y,1);
+}
+else{my_y=c(my_y,0);}#0 is single-chain
+}
+\end{lstlisting}
+\section{\textbf{\fontsize{12pt}{\baselineskip}{结果比较}}}
+使用上述贝叶斯统计的方法获得my\_y01序列，其与标准结构的差别率为51.9\%,而使用icshape的方法获得y序列，
+其与标准结构的差别率为36\%.比较Bayes方法和icshape的方法结果，差别率为51\%.
+但是比较x\_i\_case和结果的相关性，icshape的方法只有-0.19(RT值越大，更倾向$\theta=0$,即y[i]=0所以是负相关)
+而Bayes method 达到-0.34，可见Bayes method 更优。主要问题是4组数据变2组用直接相除法可能不太理想。如果在原来实验组-$\alpha$乘以对照组的基础上用Bayes method效果可能比较好。
+
+如果尝试用$\log(case)=A*\log(control)+B+signal$对模型进行拟合：
+则R代码如下：
+\begin{lstlisting}{language=R}
+control<-(x1+x2)/2;
+plot(x=log(control),y=log(x3),pch=20,col='red',
+ylab='log(case)')
+abline(lm(log(x3)~log(control)),col='blue')
+my_coff=lm(log(x3)~log(control))
+intercept=my_coff$coefficients[1]
+slope=my_coff$coefficients[2]
+signal_value_1=log(x3)-(intercept+slope*log(control))
+signal_value_2=log(x3)-(intercept+slope*log(control))
+\end{lstlisting}
+上面做出的$\log(case) \sim \log(control)$如下所示
+\begin{figure}[!ht]
+\centering
+\caption{线性回归拟合}
+\includegraphics[width=400pt]{Plotting3.eps}
+\end{figure}
+
+\newpage
+对$signal_value_1$做直方图如下：
+\begin{figure}[!ht]
+\centering
+\caption{$signal_value_1$的直方图}
+\includegraphics[width=400pt]{Plotting4.eps}
+\end{figure}
+
+
+由上图可以看出，$signal_value_1$有两个峰，可以近似认为是两组正态样本混叠在一起。
+使用上述得到signal的方法用贝叶斯统计估计原01序列，得my\_y,icshape给出的01序列与signal\_value\_1的相关性只有-0.23,而用用贝叶斯统计的方法结果与signal\_value\_1的相关性可达-0.45.两种方法差别率为43\%。
+
+
+
+
+\section{\textbf{\fontsize{12pt}{\baselineskip}{参考文献}}}
+\begin{thebibliography}{}
+\bibitem{Bib1}    
+ 生物信息学
+ 
+\end{thebibliography}
+\end{document}
